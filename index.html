@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авиакомпания - Бронирование билетов</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">✈️ SkyFly Airlines</div>
+            <div class="nav-links">
+                <a href="index.html">Главная</a>
+                <a href="login.html">Вход</a>
+                <a href="register.html">Регистрация</a>
+                <a href="admin.html">Админ-панель</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Найдите свой идеальный рейс</h1>
+            <p>Бронируйте авиабилеты быстро и удобно</p>
+        </section>
+
+        <section class="search-section">
+            <h2>Поиск рейсов</h2>
+            <form id="searchForm" class="search-form">
+                <div class="form-group">
+                    <label for="departureCity">Город вылета</label>
+                    <input type="text" id="departureCity" required placeholder="Москва">
+                </div>
+                <div class="form-group">
+                    <label for="arrivalCity">Город прилета</label>
+                    <input type="text" id="arrivalCity" required placeholder="Санкт-Петербург">
+                </div>
+                <div class="form-group">
+                    <label for="departureDate">Дата вылета</label>
+                    <input type="date" id="departureDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Найти рейсы</button>
+            </form>
+        </section>
+
+        <section id="resultsSection" class="results-section" style="display: none;">
+            <h2>Доступные рейсы</h2>
+            <div id="flightsList" class="flights-list"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 SkyFly Airlines. Все права защищены.</p>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="auth-front.js"></script>
+    <script src="flights-front.js"></script>
+</body>
+</html>

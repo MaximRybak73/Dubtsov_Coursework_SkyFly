@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Авиакомпания</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">✈️ SkyFly Airlines</div>
+            <div class="nav-links">
+                <a href="index.html">Главная</a>
+                <a href="login.html">Вход</a>
+                <a href="register.html">Регистрация</a>
+                <a href="admin.html">Админ-панель</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="auth-container">
+            <h1>Регистрация</h1>
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="firstName">Имя</label>
+                    <input type="text" id="firstName" required placeholder="Иван">
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Фамилия</label>
+                    <input type="text" id="lastName" required placeholder="Иванов">
+                </div>
+                <div class="form-group">
+                    <label for="passportNumber">Номер паспорта</label>
+                    <input type="text" id="passportNumber" required placeholder="1234 567890">
+                </div>
+                <div class="form-group">
+                    <label for="dateOfBirth">Дата рождения</label>
+                    <input type="date" id="dateOfBirth" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" required placeholder="Минимум 6 символов">
+                </div>
+                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            </form>
+            <p class="auth-link">Уже есть аккаунт? <a href="login.html">Войти</a></p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 SkyFly Airlines. Все права защищены.</p>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="auth-front.js"></script>
+</body>
+</html>

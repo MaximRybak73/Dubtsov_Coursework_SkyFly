@@ -3,61 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация - Авиакомпания</title>
+    <title>✈️ MaxFly Airlines - Регистрация</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- НАВИГАЦИЯ -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">✈️ SkyFly Airlines</div>
-            <div class="nav-links">
-                <a href="index.html">Главная</a>
-                <a href="login.html">Вход</a>
-                <a href="register.html">Регистрация</a>
-                <a href="admin.html">Админ-панель</a>
-            </div>
+            <div class="logo">✈️ MaxFly Airlines</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="login.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+            </ul>
         </div>
     </nav>
 
-    <main class="container">
-        <div class="auth-container">
+    <!-- ФОРМА РЕГИСТРАЦИИ -->
+    <div class="container">
+        <div class="auth-form">
             <h1>Регистрация</h1>
-            <form id="registerForm" class="auth-form">
+            <form id="registerForm">
                 <div class="form-group">
-                    <label for="firstName">Имя</label>
-                    <input type="text" id="firstName" required placeholder="Иван">
+                    <label for="firstName">Имя *</label>
+                    <input type="text" id="firstName" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="lastName">Фамилия</label>
-                    <input type="text" id="lastName" required placeholder="Иванов">
+                    <label for="lastName">Фамилия *</label>
+                    <input type="text" id="lastName" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="passportNumber">Номер паспорта</label>
-                    <input type="text" id="passportNumber" required placeholder="1234 567890">
+                    <label for="passportNumber">Номер паспорта *</label>
+                    <input type="text" id="passportNumber" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="dateOfBirth">Дата рождения</label>
+                    <label for="dateOfBirth">Дата рождения *</label>
                     <input type="date" id="dateOfBirth" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" required placeholder="example@mail.com">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="registerPassword">Пароль</label>
-                    <input type="password" id="registerPassword" required placeholder="Минимум 6 символов">
+                    <label for="password">Пароль *</label>
+                    <input type="password" id="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Номер телефона</label>
+                    <input type="tel" id="phoneNumber">
+                </div>
+
+                <button type="submit" class="btn-primary">Зарегистрироваться</button>
             </form>
-            <p class="auth-link">Уже есть аккаунт? <a href="login.html">Войти</a></p>
+
+            <p style="text-align: center; margin-top: 20px;">
+                Уже есть аккаунт? <a href="login.html">Войти</a>
+            </p>
         </div>
-    </main>
+    </div>
 
-    <footer class="footer">
-        <p>&copy; 2025 SkyFly Airlines. Все права защищены.</p>
-    </footer>
+    <!-- ПОДКЛЮЧЕНИЕ JAVASCRIPT -->
+    <script src="php_database.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('registerForm');
 
-    <script src="api.js"></script>
-    <script src="auth-front.js"></script>
+            if (registerForm) {
+                registerForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const lastName = document.getElementById('lastName').value.trim();
+                    const passportNumber = document.getElementById('passportNumber').value.trim();
+                    const dateOfBirth = document.getElementById('dateOfBirth').value;
+                    const email = document.getElementById('email').value.trim();
+                    const password = document.getElementById('password').value;
+                    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+
+                    if (!firstName || !lastName || !passportNumber || !dateOfBirth || !email || !password) {
+                        alert('❌ Пожалуйста, заполните все обязательные поля');
+                        return;
+                    }
+
+                    if (email.indexOf('@') === -1) {
+                        alert('❌ Пожалуйста, введите корректный email');
+                        return;
+                    }
+
+                    if (password.length < 6) {
+                        alert('❌ Пароль должен быть не менее 6 символов');
+                        return;
+                    }
+
+                    await registerPassenger(firstName, lastName, passportNumber, dateOfBirth, email, password, phoneNumber);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -3,59 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авиакомпания - Бронирование билетов</title>
+    <title>✈️ MaxFly Airlines - Главная</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- НАВИГАЦИЯ -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">✈️ SkyFly Airlines</div>
-            <div class="nav-links">
-                <a href="index.html">Главная</a>
-                <a href="login.html">Вход</a>
-                <a href="register.html">Регистрация</a>
-                <a href="admin.html">Админ-панель</a>
-            </div>
+            <div class="logo">✈️ MaxFly Airlines</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="login.html" id="navLogin">Вход</a></li>
+                <li><a href="register.html" id="navRegister">Регистрация</a></li>
+                <li><a href="profile.html" id="navProfile" style="display: none;">Мой кабинет</a></li>
+                <li><a href="#" onclick="logoutPassenger(); return false;" id="navLogout" style="display: none;">Выход</a></li>
+            </ul>
         </div>
     </nav>
 
-    <main class="container">
-        <section class="hero">
-            <h1>Найдите свой идеальный рейс</h1>
+    <!-- ГЛАВНЫЙ КОНТЕНТ -->
+    <div class="container">
+        <!-- БАННЕР -->
+        <div class="hero">
+            <h1>Путешествуйте по максимуму!</h1>
             <p>Бронируйте авиабилеты быстро и удобно</p>
-        </section>
+        </div>
 
-        <section class="search-section">
+        <!-- ФОРМА ПОИСКА РЕЙСОВ -->
+        <div class="search-section">
             <h2>Поиск рейсов</h2>
-            <form id="searchForm" class="search-form">
+            <form id="searchFlightsForm" class="search-form">
                 <div class="form-group">
-                    <label for="departureCity">Город вылета</label>
-                    <input type="text" id="departureCity" required placeholder="Москва">
+                    <label for="departureCity">Город вылета:</label>
+                    <select id="departureCity" required>
+                        <option value="">-- Выберите город --</option>
+                    </select>
                 </div>
+
                 <div class="form-group">
-                    <label for="arrivalCity">Город прилета</label>
-                    <input type="text" id="arrivalCity" required placeholder="Санкт-Петербург">
+                    <label for="arrivalCity">Город прилета:</label>
+                    <select id="arrivalCity" required>
+                        <option value="">-- Выберите город --</option>
+                    </select>
                 </div>
+
                 <div class="form-group">
-                    <label for="departureDate">Дата вылета</label>
+                    <label for="departureDate">Дата вылета:</label>
                     <input type="date" id="departureDate" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Найти рейсы</button>
+
+                <button type="submit" class="btn-primary">Найти рейсы</button>
             </form>
-        </section>
+        </div>
 
-        <section id="resultsSection" class="results-section" style="display: none;">
-            <h2>Доступные рейсы</h2>
-            <div id="flightsList" class="flights-list"></div>
-        </section>
-    </main>
+        <!-- РЕЗУЛЬТАТЫ ПОИСКА -->
+        <div id="flightsResults" class="results-section">
+            <p>Введите параметры поиска и нажмите "Найти рейсы"</p>
+        </div>
+    </div>
 
-    <footer class="footer">
-        <p>&copy; 2025 SkyFly Airlines. Все права защищены.</p>
-    </footer>
+    <!-- ПОДКЛЮЧЕНИЕ JAVASCRIPT -->
+    <script src="php_database.js"></script>
+    <script>
+        // Обработка формы поиска
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCities();
 
-    <script src="api.js"></script>
-    <script src="auth-front.js"></script>
-    <script src="flights-front.js"></script>
+            const searchForm = document.getElementById('searchFlightsForm');
+
+            if (searchForm) {
+                searchForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const departureCity = document.getElementById('departureCity').value;
+                    const arrivalCity = document.getElementById('arrivalCity').value;
+                    const departureDate = document.getElementById('departureDate').value;
+
+                    if (!departureCity || !arrivalCity || !departureDate) {
+                        alert('❌ Пожалуйста, заполните все поля поиска');
+                        return;
+                    }
+
+                    if (departureCity === arrivalCity) {
+                        alert('❌ Город вылета не должен совпадать с городом прилета');
+                        return;
+                    }
+
+                    const resultsContainer = document.getElementById('flightsResults');
+                    if (resultsContainer) {
+                        resultsContainer.innerHTML = '<p>⏳ Поиск рейсов...</p>';
+                    }
+
+                    const flights = await searchFlights(departureCity, arrivalCity, departureDate);
+                    displayFlights(flights);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

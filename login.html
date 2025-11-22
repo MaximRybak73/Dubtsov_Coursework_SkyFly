@@ -3,45 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход - Авиакомпания</title>
+    <title>✈️ MaxFly Airlines - Вход</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- НАВИГАЦИЯ -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">✈️ SkyFly Airlines</div>
-            <div class="nav-links">
-                <a href="index.html">Главная</a>
-                <a href="login.html">Вход</a>
-                <a href="register.html">Регистрация</a>
-                <a href="admin.html">Админ-панель</a>
-            </div>
+            <div class="logo">✈️ MaxFly Airlines</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="login.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+            </ul>
         </div>
     </nav>
 
-    <main class="container">
-        <div class="auth-container">
+    <!-- ФОРМА ВХОДА -->
+    <div class="container">
+        <div class="auth-form">
             <h1>Вход в личный кабинет</h1>
-            <form id="loginForm" class="auth-form">
+            <form id="loginForm">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="example@mail.com">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="password">Пароль</label>
-                    <input type="password" id="password" required placeholder="Введите пароль">
+                    <label for="password">Пароль *</label>
+                    <input type="password" id="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Войти</button>
+
+                <button type="submit" class="btn-primary">Войти</button>
             </form>
-            <p class="auth-link">Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
+
+            <p style="text-align: center; margin-top: 20px;">
+                Нет аккаунта? <a href="register.html">Зарегистрироваться</a>
+            </p>
         </div>
-    </main>
+    </div>
 
-    <footer class="footer">
-        <p>&copy; 2025 SkyFly Airlines. Все права защищены.</p>
-    </footer>
+    <!-- ПОДКЛЮЧЕНИЕ JAVASCRIPT -->
+    <script src="php_database.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
 
-    <script src="api.js"></script>
-    <script src="auth-front.js"></script>
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const email = document.getElementById('email').value.trim();
+                    const password = document.getElementById('password').value;
+
+                    if (!email || !password) {
+                        alert('❌ Пожалуйста, заполните email и пароль');
+                        return;
+                    }
+
+                    if (email.indexOf('@') === -1) {
+                        alert('❌ Пожалуйста, введите корректный email');
+                        return;
+                    }
+
+                    await loginPassenger(email, password);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

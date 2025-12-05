@@ -1,23 +1,16 @@
 <?php
-// ═════════════════════════════════════════════════════════════════════════════
-// ✈️  API НА PHP - ВСЕ ENDPOINTS
-// ═════════════════════════════════════════════════════════════════════════════
-
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Content-Type: application/json; charset=utf-8');
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 require_once 'config.php';
 
-// Получаем данные из POST запроса
-$data = json_decode(file_get_contents('php://input'), true);
+// Получаем действие и данные
 $action = isset($_GET['action']) ? $_GET['action'] : '';
+$data = json_decode(file_get_contents('php://input'), true) ?? $_GET;
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 1️⃣  РЕГИСТРАЦИЯ
-// ═════════════════════════════════════════════════════════════════════════════
-
+// ========================================
+// РЕГИСТРАЦИЯ
 if ($action === 'register') {
     $firstName = isset($data['FirstName']) ? $connection->real_escape_string($data['FirstName']) : '';
     $lastName = isset($data['LastName']) ? $connection->real_escape_string($data['LastName']) : '';
@@ -34,8 +27,7 @@ if ($action === 'register') {
 
     // Проверка если email уже существует
     $checkEmail = $connection->query("SELECT PassengerID FROM Passenger WHERE Email = '$email'");
-
-    if ($checkEmail->num_rows > 0) {
+    if ($checkEmail && $checkEmail->num_rows > 0) {
         sendResponse(false, 'Email уже зарегистрирован');
     }
 
@@ -43,8 +35,8 @@ if ($action === 'register') {
     $hashedPassword = hashPassword($password);
 
     // Вставляем нового пассажира
-    $query = "INSERT INTO Passenger (FirstName, LastName, PassportNumber, DateOfBirth, Email, Password, PhoneNumber) 
-              VALUES ('$firstName', '$lastName', '$passportNumber', '$dateOfBirth', '$email', '$hashedPassword', '$phoneNumber')";
+    $query = "INSERT INTO Passenger (FirstName, LastName, PassportNumber, DateOfBirth, Email, Password, PhoneNumber)
+    VALUES ('$firstName', '$lastName', '$passportNumber', '$dateOfBirth', '$email', '$hashedPassword', '$phoneNumber')";
 
     if ($connection->query($query)) {
         sendResponse(true, 'Регистрация успешна');
@@ -53,11 +45,9 @@ if ($action === 'register') {
     }
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 2️⃣  ВХОД
-// ═════════════════════════════════════════════════════════════════════════════
-
-if ($action === 'login') {
+// ========================================
+// ВХОД
+else if ($action === 'login') {
     $email = isset($data['Email']) ? $connection->real_escape_string($data['Email']) : '';
     $password = isset($data['Password']) ? $data['Password'] : '';
 
@@ -69,7 +59,7 @@ if ($action === 'login') {
     $query = "SELECT * FROM Passenger WHERE Email = '$email'";
     $result = $connection->query($query);
 
-    if ($result->num_rows === 0) {
+    if (!$result || $result->num_rows === 0) {
         sendResponse(false, 'Пассажир не найден');
     }
 
@@ -82,17 +72,18 @@ if ($action === 'login') {
 
     // Удаляем пароль из результата
     unset($passenger['Password']);
-
     sendResponse(true, 'Вход успешен', ['passenger' => $passenger]);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 3️⃣  ПОЛУЧИТЬ АЭРОПОРТЫ
-// ═════════════════════════════════════════════════════════════════════════════
-
-if ($action === 'get-airports') {
+// ========================================
+// ПОЛУЧИТЬ АЭРОПОРТЫ
+else if ($action === 'get-airports') {
     $query = "SELECT DISTINCT City FROM Airport ORDER BY City ASC";
     $result = $connection->query($query);
+
+    if (!$result) {
+        sendResponse(false, 'Ошибка БД: ' . $connection->error);
+    }
 
     $airports = [];
     while ($row = $result->fetch_assoc()) {
@@ -102,11 +93,9 @@ if ($action === 'get-airports') {
     sendResponse(true, '', ['airports' => $airports]);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 4️⃣  ПОИСК РЕЙСОВ
-// ═════════════════════════════════════════════════════════════════════════════
-
-if ($action === 'search-flights') {
+// ========================================
+// ПОИСК РЕЙСОВ
+else if ($action === 'search-flights') {
     $departureCity = isset($data['DepartureCity']) ? $connection->real_escape_string($data['DepartureCity']) : '';
     $arrivalCity = isset($data['ArrivalCity']) ? $connection->real_escape_string($data['ArrivalCity']) : '';
     $departureDate = isset($data['DepartureDate']) ? $connection->real_escape_string($data['DepartureDate']) : '';
@@ -117,27 +106,26 @@ if ($action === 'search-flights') {
 
     // SQL запрос для поиска рейсов
     $query = "
-        SELECT 
-            f.FlightID,
-            f.FlightNumber,
-            a1.City AS DepartureCity,
-            a2.City AS ArrivalCity,
-            f.DepartureDateTime,
-            f.ArrivalDateTime,
-            f.Status,
-            f.BasePrice,
-            ac.Model AS AircraftModel,
-            ac.Capacity,
-            (SELECT COUNT(*) FROM Booking WHERE FlightID = f.FlightID AND Status != 'Отменен') as BookedSeats
-        FROM Flight f
-        JOIN Airport a1 ON f.DepartureAirportID = a1.AirportID
-        JOIN Airport a2 ON f.ArrivalAirportID = a2.AirportID
-        JOIN Aircraft ac ON f.AircraftID = ac.AircraftID
-        WHERE a1.City = '$departureCity' 
-        AND a2.City = '$arrivalCity' 
-        AND DATE(f.DepartureDateTime) = '$departureDate'
-        AND f.Status != 'Отменен'
-        ORDER BY f.DepartureDateTime ASC
+    SELECT
+        f.FlightID,
+        f.FlightNumber,
+        a1.City AS DepartureCity,
+        a2.City AS ArrivalCity,
+        f.DepartureDateTime,
+        f.ArrivalDateTime,
+        f.Status,
+        f.BasePrice,
+        ac.Model AS AircraftModel,
+        ac.Capacity,
+        (SELECT COUNT(*) FROM Booking WHERE FlightID = f.FlightID) as BookedSeats
+    FROM Flight f
+    JOIN Airport a1 ON f.DepartureAirportID = a1.AirportID
+    JOIN Airport a2 ON f.ArrivalAirportID = a2.AirportID
+    JOIN Aircraft ac ON f.AircraftID = ac.AircraftID
+    WHERE a1.City = '$departureCity'
+    AND a2.City = '$arrivalCity'
+    AND DATE(f.DepartureDateTime) = '$departureDate'
+    ORDER BY f.DepartureDateTime ASC
     ";
 
     $result = $connection->query($query);
@@ -154,11 +142,9 @@ if ($action === 'search-flights') {
     sendResponse(true, '', ['flights' => $flights]);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 5️⃣  СОЗДАТЬ БРОНИРОВАНИЕ
-// ═════════════════════════════════════════════════════════════════════════════
-
-if ($action === 'create-booking') {
+// ========================================
+// СОЗДАТЬ БРОНИРОВАНИЕ
+else if ($action === 'create-booking') {
     $passengerID = isset($data['PassengerID']) ? (int)$data['PassengerID'] : 0;
     $flightID = isset($data['FlightID']) ? (int)$data['FlightID'] : 0;
     $seatNumber = isset($data['SeatNumber']) ? $connection->real_escape_string($data['SeatNumber']) : '';
@@ -169,62 +155,58 @@ if ($action === 'create-booking') {
 
     // Проверяем если место уже забронировано
     $checkSeat = $connection->query("
-        SELECT BookingID FROM Booking 
-        WHERE FlightID = $flightID 
-        AND SeatNumber = '$seatNumber' 
-        AND Status != 'Отменен'
+    SELECT BookingID FROM Booking
+    WHERE FlightID = $flightID
+    AND SeatNumber = '$seatNumber'
     ");
 
-    if ($checkSeat->num_rows > 0) {
+    if ($checkSeat && $checkSeat->num_rows > 0) {
         sendResponse(false, 'Это место уже забронировано');
     }
 
     // Получаем цену рейса
     $flightQuery = $connection->query("SELECT BasePrice FROM Flight WHERE FlightID = $flightID");
 
-    if ($flightQuery->num_rows === 0) {
+    if (!$flightQuery || $flightQuery->num_rows === 0) {
         sendResponse(false, 'Рейс не найден');
     }
 
     $flight = $flightQuery->fetch_assoc();
     $totalPrice = $flight['BasePrice'];
 
-    // Вставляем бронирование
+    // Вставляем бронирование с статусом 'оплачен'
     $bookingQuery = "
-        INSERT INTO Booking (PassengerID, FlightID, Status, TotalPrice, SeatNumber, BookingDate) 
-        VALUES ($passengerID, $flightID, 'Подтвережден', $totalPrice, '$seatNumber', NOW())
+    INSERT INTO Booking (PassengerID, FlightID, Status, TotalPrice, SeatNumber, BookingDate)
+    VALUES ($passengerID, $flightID, 'оплачен', $totalPrice, '$seatNumber', NOW())
     ";
 
-    if ($connection->query($bookingQuery)) {
-        $bookingID = $connection->insert_id;
-
-        // Создаем платеж
-        $paymentQuery = "
-            INSERT INTO Payment (BookingID, Amount, PaymentMethod, Status, PaymentDate) 
-            VALUES ($bookingID, $totalPrice, 'Карта', 'Завершен', NOW())
-        ";
-
-        $connection->query($paymentQuery);
-
-        // Создаем посадочный талон
-        $boardingQuery = "
-            INSERT INTO BoardingPass (BookingID, Gate, BoardingTime, CheckinStatus) 
-            VALUES ($bookingID, '1A', DATE_ADD(NOW(), INTERVAL 1 DAY), 'Не регистрирован')
-        ";
-
-        $connection->query($boardingQuery);
-
-        sendResponse(true, 'Бронирование успешно', ['bookingID' => $bookingID]);
-    } else {
+    if (!$connection->query($bookingQuery)) {
         sendResponse(false, 'Ошибка при бронировании: ' . $connection->error);
     }
+
+    $bookingID = $connection->insert_id;
+
+    // Создаем платеж (ошибка не критична)
+    $paymentQuery = "
+    INSERT INTO Payment (BookingID, Amount, PaymentMethod, Status, PaymentDate)
+    VALUES ($bookingID, $totalPrice, 'Карта', 'оплачен', NOW())
+    ";
+    @$connection->query($paymentQuery);
+
+    // Создаем посадочный талон (ошибка не критична)
+    $boardingQuery = "
+    INSERT INTO BoardingPass (BookingID, Gate, BoardingTime, CheckinStatus)
+    VALUES ($bookingID, '1A', DATE_ADD(NOW(), INTERVAL 1 DAY), 'Не регистрирован')
+    ";
+    @$connection->query($boardingQuery);
+
+    // ОБЯЗАТЕЛЬНЫЙ ОТВЕТ
+    sendResponse(true, 'Бронирование успешно', ['bookingID' => $bookingID]);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 6️⃣  ПОЛУЧИТЬ БРОНИРОВАНИЯ ПАССАЖИРА
-// ═════════════════════════════════════════════════════════════════════════════
-
-if ($action === 'get-bookings') {
+// ========================================
+// ПОЛУЧИТЬ БРОНИРОВАНИЯ ПАССАЖИРА
+else if ($action === 'get-bookings') {
     $passengerID = isset($data['PassengerID']) ? (int)$data['PassengerID'] : 0;
 
     if (!$passengerID) {
@@ -232,29 +214,29 @@ if ($action === 'get-bookings') {
     }
 
     $query = "
-        SELECT 
-            b.BookingID,
-            b.Status,
-            b.TotalPrice,
-            b.SeatNumber,
-            b.BookingDate,
-            f.FlightNumber,
-            a1.City AS DepartureCity,
-            a2.City AS ArrivalCity,
-            f.DepartureDateTime,
-            f.ArrivalDateTime,
-            p2.Status as PaymentStatus,
-            bp.Gate,
-            bp.BoardingTime,
-            bp.CheckinStatus
-        FROM Booking b
-        JOIN Flight f ON b.FlightID = f.FlightID
-        JOIN Airport a1 ON f.DepartureAirportID = a1.AirportID
-        JOIN Airport a2 ON f.ArrivalAirportID = a2.AirportID
-        LEFT JOIN Payment p2 ON b.BookingID = p2.BookingID
-        LEFT JOIN BoardingPass bp ON b.BookingID = bp.BookingID
-        WHERE b.PassengerID = $passengerID
-        ORDER BY f.DepartureDateTime DESC
+    SELECT
+        b.BookingID,
+        b.Status,
+        b.TotalPrice,
+        b.SeatNumber,
+        b.BookingDate,
+        f.FlightNumber,
+        a1.City AS DepartureCity,
+        a2.City AS ArrivalCity,
+        f.DepartureDateTime,
+        f.ArrivalDateTime,
+        p2.Status as PaymentStatus,
+        bp.Gate,
+        bp.BoardingTime,
+        bp.CheckinStatus
+    FROM Booking b
+    JOIN Flight f ON b.FlightID = f.FlightID
+    JOIN Airport a1 ON f.DepartureAirportID = a1.AirportID
+    JOIN Airport a2 ON f.ArrivalAirportID = a2.AirportID
+    LEFT JOIN Payment p2 ON b.BookingID = p2.BookingID
+    LEFT JOIN BoardingPass bp ON b.BookingID = bp.BookingID
+    WHERE b.PassengerID = $passengerID
+    ORDER BY f.DepartureDateTime DESC
     ";
 
     $result = $connection->query($query);
@@ -271,6 +253,9 @@ if ($action === 'get-bookings') {
     sendResponse(true, '', ['bookings' => $bookings]);
 }
 
-// Если action неизвестен
-sendResponse(false, 'Неизвестное действие');
+// ========================================
+// ЕСЛИ ACTION НЕИЗВЕСТЕН
+else {
+    sendResponse(false, 'Неизвестное действие');
+}
 ?>

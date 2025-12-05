@@ -3,83 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель - Авиакомпания</title>
+    <title>MaxFly Airlines - Администратор</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Навигация - ТОЛЬКО ДВЕ КНОПКИ ДЛЯ АДМИНА -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">✈️ SkyFly Airlines</div>
+            <div class="nav-brand">✈️ MaxFly Airlines</div>
             <div class="nav-links">
-                <a href="index.html">Главная</a>
-                <a href="admin.html">Админ-панель</a>
-                <a href="#" id="adminLogoutBtn">Выход</a>
+                <a href="admin.html" id="navAdminCabinet" style="background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">⚙️ Администрирование</a>
+                <a href="#" id="navAdminLogout" onclick="logoutAdmin(); return false;" style="color: #ff6b6b; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">Выход</a>
             </div>
         </div>
     </nav>
 
-    <main class="container">
-        <h1>Панель администратора</h1>
-
-        <section class="admin-section">
-            <h2>Добавить новый рейс</h2>
-            <form id="addFlightForm" class="admin-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="flightNumber">Номер рейса</label>
-                        <input type="text" id="flightNumber" required placeholder="SU123">
-                    </div>
-                    <div class="form-group">
-                        <label for="aircraftId">ID самолета</label>
-                        <input type="number" id="aircraftId" required placeholder="1" min="1">
-                    </div>
+    <!-- Админ панель -->
+    <div class="container">
+        <div class="admin-section">
+            <h2>⚙️ Административная панель</h2>
+            
+            <div class="admin-section">
+                <h3>Управление рейсами</h3>
+                <div class="flights-management" id="flightsManagement">
+                    <p style="text-align: center; color: #999;">Загрузка рейсов...</p>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="departureAirportId">ID аэропорта вылета</label>
-                        <input type="number" id="departureAirportId" required placeholder="1" min="1">
+            <div class="admin-section">
+                <h3>Добавить новый рейс</h3>
+                <form class="admin-form" onsubmit="handleAddFlight(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="flightNumber">Номер рейса</label>
+                            <input type="text" id="flightNumber" required placeholder="Например: SU1001">
+                        </div>
+                        <div class="form-group">
+                            <label for="departureCity">Город вылета</label>
+                            <input type="text" id="departureCity" required placeholder="Москва">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="arrivalAirportId">ID аэропорта прилета</label>
-                        <input type="number" id="arrivalAirportId" required placeholder="2" min="1">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="arrivalCity">Город прилета</label>
+                            <input type="text" id="arrivalCity" required placeholder="Санкт-Петербург">
+                        </div>
+                        <div class="form-group">
+                            <label for="aircraft">Тип самолёта</label>
+                            <input type="text" id="aircraft" required placeholder="Boeing 737">
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="departureDateTime">Дата и время вылета</label>
-                        <input type="datetime-local" id="departureDateTime" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="capacity">Вместимость</label>
+                            <input type="number" id="capacity" required placeholder="180">
+                        </div>
+                        <div class="form-group">
+                            <label for="basePrice">Базовая цена (₽)</label>
+                            <input type="number" id="basePrice" required placeholder="5000">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="arrivalDateTime">Дата и время прилета</label>
-                        <input type="datetime-local" id="arrivalDateTime" required>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="departureDateTime">Дата и время вылета</label>
+                            <input type="datetime-local" id="departureDateTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="arrivalDateTime">Дата и время прилета</label>
+                            <input type="datetime-local" id="arrivalDateTime" required>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="basePrice">Базовая цена (₽)</label>
-                        <input type="number" id="basePrice" required placeholder="5000" step="0.01">
-                    </div>
-                </div>
+                    <button type="submit" class="btn btn-primary btn-center">Добавить рейс</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                <button type="submit" class="btn btn-primary">Добавить рейс</button>
-            </form>
-        </section>
-
-        <section class="admin-section">
-            <h2>Управление рейсами</h2>
-            <div id="flightsManagement" class="flights-management"></div>
-        </section>
-    </main>
-
+    <!-- Футер -->
     <footer class="footer">
-        <p>&copy; 2025 SkyFly Airlines. Все права защищены.</p>
+        <p>&copy; 2024 MaxFly Airlines. Все права защищены.</p>
     </footer>
 
-    <script src="api.js"></script>
-    <script src="auth-front.js"></script>
-    <script src="admin-front.js"></script>
+    <script src="php_database.js"></script>
+    <script>
+        // Проверка: только админ может видеть эту страницу
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isAdmin()) {
+                alert('❌ Доступ запрещен! Только администраторы могут открывать эту страницу.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            updateNavigation();
+            highlightActiveLink();
+        });
+
+        // Обработка добавления рейса
+        function handleAddFlight(event) {
+            event.preventDefault();
+            alert('⚙️ Функция добавления рейса находится в разработке');
+            // Здесь будет логика добавления рейса через API
+        }
+
+        // Активация текущей ссылки навигации
+        function highlightActiveLink() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

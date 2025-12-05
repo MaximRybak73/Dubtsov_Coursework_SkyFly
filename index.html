@@ -1,104 +1,117 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✈️ MaxFly Airlines - Главная</title>
+    <title>MaxFly Airlines - Главная</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <!-- НАВИГАЦИЯ -->
+    <!-- Навигация -->
     <nav class="navbar">
         <div class="container">
-            <div class="logo">✈️ MaxFly Airlines</div>
-            <ul class="nav-links">
-                <li><a href="index.html">Главная</a></li>
-                <li><a href="login.html" id="navLogin">Вход</a></li>
-                <li><a href="register.html" id="navRegister">Регистрация</a></li>
-                <li><a href="profile.html" id="navProfile" style="display: none;">Мой кабинет</a></li>
-                <li><a href="#" onclick="logoutPassenger(); return false;" id="navLogout" style="display: none;">Выход</a></li>
-            </ul>
+            <div class="nav-brand">✈️ MaxFly Airlines</div>
+            <div class="nav-links">
+                <a href="index.html" id="navHome"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Главная</a>
+                <a href="login.html" id="navLogin"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Вход</a>
+                <a href="register.html" id="navRegister"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Регистрация</a>
+                <a href="profile.html" id="navProfile"
+                    style="display: none; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">👤
+                    Личный кабинет</a>
+                <a href="#" id="navLogout" onclick="logoutPassenger(); return false;"
+                    style="display: none; color: #ff6b6b; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">Выход</a>
+            </div>
         </div>
     </nav>
 
-    <!-- ГЛАВНЫЙ КОНТЕНТ -->
+    <!-- Главная секция -->
     <div class="container">
-        <!-- БАННЕР -->
         <div class="hero">
             <h1>Путешествуйте по максимуму!</h1>
             <p>Бронируйте авиабилеты быстро и удобно</p>
         </div>
 
-        <!-- ФОРМА ПОИСКА РЕЙСОВ -->
+        <!-- Поиск рейсов -->
         <div class="search-section">
             <h2>Поиск рейсов</h2>
-            <form id="searchFlightsForm" class="search-form">
-                <div class="form-group">
-                    <label for="departureCity">Город вылета:</label>
-                    <select id="departureCity" required>
-                        <option value="">-- Выберите город --</option>
-                    </select>
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departureCity">Город вылета:</label>
+                        <select id="departureCity" required>
+                            <option value="">-- Выберите город --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="arrivalCity">Город прилета:</label>
+                        <select id="arrivalCity" required>
+                            <option value="">-- Выберите город --</option>
+                        </select>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="arrivalCity">Город прилета:</label>
-                    <select id="arrivalCity" required>
-                        <option value="">-- Выберите город --</option>
-                    </select>
-                </div>
-
                 <div class="form-group">
                     <label for="departureDate">Дата вылета:</label>
                     <input type="date" id="departureDate" required>
                 </div>
-
-                <button type="submit" class="btn-primary">Найти рейсы</button>
+                <button type="submit" class="btn btn-primary">Найти рейсы</button>
             </form>
         </div>
 
-        <!-- РЕЗУЛЬТАТЫ ПОИСКА -->
-        <div id="flightsResults" class="results-section">
-            <p>Введите параметры поиска и нажмите "Найти рейсы"</p>
+        <!-- Результаты -->
+        <div class="results-section" id="flightsResults">
+            <p style="text-align: center; color: #999;">Введите параметры поиска и нажмите "Найти рейсы"</p>
         </div>
     </div>
 
-    <!-- ПОДКЛЮЧЕНИЕ JAVASCRIPT -->
+    <!-- Футер -->
+    <footer class="footer">
+        <p>&copy; 2024 MaxFly Airlines. Все права защищены.</p>
+    </footer>
+
     <script src="php_database.js"></script>
     <script>
-        // Обработка формы поиска
-        document.addEventListener('DOMContentLoaded', function() {
+        // Обновление навигации при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            updateNavigation();
             loadCities();
+            highlightActiveLink();
+        });
 
-            const searchForm = document.getElementById('searchFlightsForm');
+        // Обработка поиска рейсов
+        function handleSearch(event) {
+            event.preventDefault();
+            const departure = document.getElementById('departureCity').value;
+            const arrival = document.getElementById('arrivalCity').value;
+            const date = document.getElementById('departureDate').value;
 
-            if (searchForm) {
-                searchForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-
-                    const departureCity = document.getElementById('departureCity').value;
-                    const arrivalCity = document.getElementById('arrivalCity').value;
-                    const departureDate = document.getElementById('departureDate').value;
-
-                    if (!departureCity || !arrivalCity || !departureDate) {
-                        alert('❌ Пожалуйста, заполните все поля поиска');
-                        return;
-                    }
-
-                    if (departureCity === arrivalCity) {
-                        alert('❌ Город вылета не должен совпадать с городом прилета');
-                        return;
-                    }
-
-                    const resultsContainer = document.getElementById('flightsResults');
-                    if (resultsContainer) {
-                        resultsContainer.innerHTML = '<p>⏳ Поиск рейсов...</p>';
-                    }
-
-                    const flights = await searchFlights(departureCity, arrivalCity, departureDate);
+            if (departure && arrival && date) {
+                searchFlights(departure, arrival, date).then(flights => {
                     displayFlights(flights);
                 });
             }
-        });
+        }
+
+        // Активация текущей ссылки навигации
+        function highlightActiveLink() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-links a');
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
     </script>
 </body>
+
 </html>

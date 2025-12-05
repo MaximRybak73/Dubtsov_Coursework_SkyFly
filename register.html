@@ -1,110 +1,130 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✈️ MaxFly Airlines - Регистрация</title>
+    <title>MaxFly Airlines - Регистрация</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <!-- НАВИГАЦИЯ -->
+    <!-- Навигация -->
     <nav class="navbar">
         <div class="container">
-            <div class="logo">✈️ MaxFly Airlines</div>
-            <ul class="nav-links">
-                <li><a href="index.html">Главная</a></li>
-                <li><a href="login.html">Вход</a></li>
-                <li><a href="register.html">Регистрация</a></li>
-            </ul>
+            <div class="nav-brand">✈️ MaxFly Airlines</div>
+            <div class="nav-links">
+                <a href="index.html" id="navHome"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Главная</a>
+                <a href="login.html" id="navLogin"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Вход</a>
+                <a href="register.html" id="navRegister"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Регистрация</a>
+                <a href="profile.html" id="navProfile"
+                    style="display: none; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">👤
+                    Личный кабинет</a>
+                   <a href="#" id="navLogout" onclick="logoutPassenger(); return false;"
+                    style="display: none; color: #ff6b6b; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">Выход</a>
+            </div>
         </div>
     </nav>
 
-    <!-- ФОРМА РЕГИСТРАЦИИ -->
+    <!-- Контейнер регистрации -->
     <div class="container">
-        <div class="auth-form">
-            <h1>Регистрация</h1>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="firstName">Имя *</label>
-                    <input type="text" id="firstName" required>
+        <div class="auth-container">
+            <h2>Регистрация</h2>
+
+            <form class="auth-form" onsubmit="handleRegister(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">Имя *</label>
+                        <input type="text" id="firstName" required placeholder="Ваше имя">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Фамилия *</label>
+                        <input type="text" id="lastName" required placeholder="Ваша фамилия">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="lastName">Фамилия *</label>
-                    <input type="text" id="lastName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="passportNumber">Номер паспорта *</label>
-                    <input type="text" id="passportNumber" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="dateOfBirth">Дата рождения *</label>
-                    <input type="date" id="dateOfBirth" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="passportNumber">Номер паспорта *</label>
+                        <input type="text" id="passportNumber" required placeholder="Например: 12 34 567890">
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth">Дата рождения *</label>
+                        <input type="date" id="dateOfBirth" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" id="email" required>
+                    <input type="email" id="email" required placeholder="Ваш email">
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Пароль *</label>
-                    <input type="password" id="password" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Пароль *</label>
+                        <input type="password" id="password" required placeholder="Минимум 6 символов">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Номер телефона</label>
+                        <input type="tel" id="phoneNumber" placeholder="Например: +7 999 123 45 67">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="phoneNumber">Номер телефона</label>
-                    <input type="tel" id="phoneNumber">
-                </div>
-
-                <button type="submit" class="btn-primary">Зарегистрироваться</button>
+                <button type="submit" class="btn btn-primary btn-center">Зарегистрироваться</button>
             </form>
 
-            <p style="text-align: center; margin-top: 20px;">
-                Уже есть аккаунт? <a href="login.html">Войти</a>
-            </p>
+            <div class="auth-link">
+                <p>Уже есть аккаунт? <a href="login.html">Войти</a></p>
+            </div>
         </div>
     </div>
 
-    <!-- ПОДКЛЮЧЕНИЕ JAVASCRIPT -->
+    <!-- Футер -->
+    <footer class="footer">
+        <p>&copy; 2024 MaxFly Airlines. Все права защищены.</p>
+    </footer>
+
     <script src="php_database.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const registerForm = document.getElementById('registerForm');
-
-            if (registerForm) {
-                registerForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-
-                    const firstName = document.getElementById('firstName').value.trim();
-                    const lastName = document.getElementById('lastName').value.trim();
-                    const passportNumber = document.getElementById('passportNumber').value.trim();
-                    const dateOfBirth = document.getElementById('dateOfBirth').value;
-                    const email = document.getElementById('email').value.trim();
-                    const password = document.getElementById('password').value;
-                    const phoneNumber = document.getElementById('phoneNumber').value.trim();
-
-                    if (!firstName || !lastName || !passportNumber || !dateOfBirth || !email || !password) {
-                        alert('❌ Пожалуйста, заполните все обязательные поля');
-                        return;
-                    }
-
-                    if (email.indexOf('@') === -1) {
-                        alert('❌ Пожалуйста, введите корректный email');
-                        return;
-                    }
-
-                    if (password.length < 6) {
-                        alert('❌ Пароль должен быть не менее 6 символов');
-                        return;
-                    }
-
-                    await registerPassenger(firstName, lastName, passportNumber, dateOfBirth, email, password, phoneNumber);
-                });
-            }
+        // Обновление навигации при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            updateNavigation();
+            highlightActiveLink();
         });
+
+        // Обработка регистрации
+        function handleRegister(event) {
+            event.preventDefault();
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const passportNumber = document.getElementById('passportNumber').value;
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+
+            registerPassenger(firstName, lastName, passportNumber, dateOfBirth, email, password, phoneNumber);
+        }
+
+        // Активация текущей ссылки навигации
+        function highlightActiveLink() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-links a');
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
     </script>
 </body>
+
 </html>

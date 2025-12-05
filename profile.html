@@ -1,41 +1,106 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет - Авиакомпания</title>
+    <title>MaxFly Airlines - Личный кабинет</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+    <!-- Навигация -->
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">✈️ MaxFly Airlines</div>
             <div class="nav-links">
-                <a href="index.html">Главная</a>
-                <a href="profile.html">Личный кабинет</a>
-                <a href="#" id="logoutBtn">Выход</a>
+                <a href="index.html" id="navHome"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Главная</a>
+                <a href="login.html" id="navLogin"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Вход</a>
+                <a href="register.html" id="navRegister"
+                    style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Регистрация</a>
+                <a href="profile.html" id="navProfile"
+                    style="display: none; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">👤
+                    Личный кабинет</a>
+                <a href="#" id="navLogout" onclick="logoutPassenger(); return false;"
+                    style="display: none; color: #ff6b6b; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">Выход</a>
             </div>
         </div>
     </nav>
 
-    <main class="container">
-        <section class="profile-section">
-            <h1>Личный кабинет</h1>
-            <div id="userInfo" class="user-info"></div>
-        </section>
+    <!-- Профиль пользователя -->
+    <div class="container">
+        <div class="profile-section">
+            <h2>Мой кабинет</h2>
 
-        <section class="bookings-section">
-            <h2>Мои бронирования</h2>
-            <div id="bookingsList" class="bookings-list"></div>
-        </section>
-    </main>
+            <div class="user-info" id="userInfo">
+                <h3>Информация о пользователе</h3>
+                <p id="userDetails">Загрузка...</p>
+            </div>
 
+            <div class="bookings-section">
+                <h3>Мои бронирования</h3>
+                <div class="bookings-list" id="bookingsList">
+                    <p style="text-align: center; color: #999;">У вас нет бронирований</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">← Вернуться на главную</button>
+        </div>
+    </div>
+
+    <!-- Футер -->
     <footer class="footer">
-        <p>&copy; 2025 MaxFly Airlines. Все права защищены.</p>
+        <p>&copy; 2024 MaxFly Airlines. Все права защищены.</p>
     </footer>
 
-    <script src="api.js"></script>
-    <script src="auth-front.js"></script>
-    <script src="profile-front.js"></script>
+    <script src="php_database.js"></script>
+    <script>
+        // Проверка авторизации
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!isUserLoggedIn()) {
+                alert('❌ Вы должны быть авторизованы!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            updateNavigation();
+            highlightActiveLink();
+            displayUserInfo();
+        });
+
+        // Отображение информации пользователя
+        function displayUserInfo() {
+            const passenger = getCurrentPassenger();
+
+            if (passenger) {
+                const userDetails = document.getElementById('userDetails');
+                userDetails.innerHTML = `
+                    <strong>Имя:</strong> ${passenger.FirstName} ${passenger.LastName}<br>
+                    <strong>Email:</strong> ${passenger.Email}<br>
+                    <strong>Телефон:</strong> ${passenger.PhoneNumber || 'Не указан'}<br>
+                    <strong>Дата рождения:</strong> ${passenger.DateOfBirth || 'Не указана'}
+                `;
+            }
+        }
+
+        // Активация текущей ссылки навигации
+        function highlightActiveLink() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-links a');
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+    </script>
 </body>
+
 </html>

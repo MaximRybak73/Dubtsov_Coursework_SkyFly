@@ -70,7 +70,7 @@ async function loginPassenger(email, password) {
         const result = await callAPI('login', data);
 
         if (result.success) {
-            // ПРОВЕРКА: если это админ
+            // Если это админ
             if (email === 'admin@admin.ru' && password === 'adminadmin') {
                 localStorage.setItem('isAdmin', 'true');
                 localStorage.setItem('adminLoggedIn', 'true');
@@ -163,7 +163,7 @@ function formatDateTime(dateTimeString) {
     return `${day}.${month} ${hours}:${minutes}`;
 }
 
-// ✅ ОТОБРАЖЕНИЕ РЕЙСОВ - ПРАВИЛЬНАЯ ВЕРСИЯ
+//ОТОБРАЖЕНИЕ РЕЙСОВ
 function displayFlights(flights) {
     const flightsContainer = document.getElementById('flightsResults');
 
@@ -184,13 +184,13 @@ function displayFlights(flights) {
     // Заголовок таблицы
     html += '<thead>';
     html += '<tr style="background-color: #1976d2; color: white;">';
-    html += '<th style="padding: 12px; text-align: left; border: 1px solid #1565c0; font-weight: bold;">Рейс</th>';
+    html += '<th style="padding: 12px; text-align: left; border: 1px solid #1565c0; font-weight: bold;">✈️ Рейс</th>';
     html += '<th style="padding: 12px; text-align: left; border: 1px solid #1565c0; font-weight: bold;">Маршрут</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Вылет</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Прилет</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Статус</th>';
-    html += '<th style="padding: 12px; text-align: right; border: 1px solid #1565c0; font-weight: bold;">Цена</th>';
-    html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Места</th>';
+    html += '<th style="padding: 12px; text-align: right; border: 1px solid #1565c0; font-weight: bold;">💰 Цена</th>';
+    html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">🪑 Места</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Действие</th>';
     html += '</tr>';
     html += '</thead>';
@@ -224,7 +224,7 @@ function displayFlights(flights) {
         html += `</td>`;
         html += `<td style="padding: 12px; text-align: center;">`;
         html += `<button onclick="bookFlight(${flight.FlightID})" style="padding: 8px 16px; background-color: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#1565c0'" onmouseout="this.style.backgroundColor='#1976d2'">`;
-        html += '🎫 Забронировать';
+        html += 'Забронировать';
         html += '</button>';
         html += '</td>';
         html += '</tr>';
@@ -313,12 +313,12 @@ async function loadCities() {
             });
 
             citiesLoaded = true;
-            console.log('✅ Города успешно загружены в selects!');
+            console.log('Города успешно загружены в selects!');
         } else {
-            console.error('❌ Ошибка загрузки городов:', response.message);
+            console.error('Ошибка загрузки городов:', response.message);
         }
     } catch (error) {
-        console.error('❌ Ошибка при загрузке городов:', error);
+        console.error('Ошибка при загрузке городов:', error);
     }
 }
 
@@ -361,7 +361,6 @@ function updateNavigation() {
     const adminBtn = document.getElementById('navAdminCabinet');
     const adminLogoutBtn = document.getElementById('navAdminLogout');
 
-    // ========================================
     // ЕСЛИ АДМИН ЗАЛОГИНЕН
     if (isAdminLogged) {
         if (loginBtn) loginBtn.style.display = 'none';
@@ -372,7 +371,7 @@ function updateNavigation() {
         if (adminBtn) adminBtn.style.display = 'inline';
         if (adminLogoutBtn) adminLogoutBtn.style.display = 'inline';
     }
-    // ========================================
+
     // ЕСЛИ ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ ЗАЛОГИНЕН
     else if (isLogged && passenger) {
         if (loginBtn) loginBtn.style.display = 'none';
@@ -389,7 +388,7 @@ function updateNavigation() {
             userNameElement.textContent = `${passenger.FirstName} ${passenger.LastName}`;
         }
     }
-    // ========================================
+
     // НИКТО НЕ ЗАЛОГИНЕН
     else {
         if (loginBtn) loginBtn.style.display = 'inline';

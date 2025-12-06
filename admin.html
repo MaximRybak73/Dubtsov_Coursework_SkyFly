@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Навигация - ТОЛЬКО ДВЕ КНОПКИ ДЛЯ АДМИНА -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">✈️ MaxFly Airlines</div>
+            <div class="nav-brand">MaxFly Airlines</div>
             <div class="nav-links">
                 <a href="admin.html" id="navAdminCabinet" style="background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">⚙️ Администрирование</a>
                 <a href="#" id="navAdminLogout" onclick="logoutAdmin(); return false;" style="color: #ff6b6b; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">Выход</a>
@@ -18,7 +17,6 @@
         </div>
     </nav>
 
-    <!-- Админ панель -->
     <div class="container">
         <div class="admin-section">
             <h2>⚙️ Административная панель</h2>
@@ -90,7 +88,7 @@
 
     <script src="php_database.js"></script>
     <script>
-        // Проверка: только админ может видеть эту страницу
+        // Проверка что только админ может видеть эту страницу
         document.addEventListener('DOMContentLoaded', function() {
             if (!isAdmin()) {
                 alert('❌ Доступ запрещен! Только администраторы могут открывать эту страницу.');
@@ -106,7 +104,6 @@
         function handleAddFlight(event) {
             event.preventDefault();
             alert('⚙️ Функция добавления рейса находится в разработке');
-            // Здесь будет логика добавления рейса через API
         }
 
         // Активация текущей ссылки навигации

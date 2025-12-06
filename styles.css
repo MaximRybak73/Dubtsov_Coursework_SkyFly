@@ -12,7 +12,7 @@ body {
 }
 
 /* Активная ссылка навигации */
-    nav a.active {
+nav a.active {
     text-decoration: underline;
     font-weight: bold;
     color: #000000;
@@ -27,9 +27,9 @@ body {
 /* навигация */
 .navbar {
     background-color: #2c82c9;
-   
+
     padding: 1rem 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar .container {
@@ -41,12 +41,13 @@ body {
 .nav-brand {
     font-size: 1.5rem;
     font-weight: bold;
+    color: white;
 }
 
 .nav-links {
     display: flex;
     gap: 2rem;
-    list-style: none;   
+    list-style: none;
 }
 
 .nav-links a {
@@ -85,7 +86,7 @@ body {
     padding: 2rem;
     border-radius: 10px;
     margin: 2rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .search-form,
@@ -140,12 +141,12 @@ body {
     transition: all 0.3s;
 }
 
-/* синяя красивая кнопка */
+/* синяя кнопка */
 .btn-primary {
     background: linear-gradient(135deg, #3498db, #2980b9);
     color: #fff;
     box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     text-align: center;
 }
 
@@ -188,7 +189,7 @@ body {
 
 .flight-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .flight-info h3 {
@@ -262,11 +263,18 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
 }
 
 .booking-info h4 {
     color: #2c3e50;
     margin-bottom: 0.5rem;
+}
+
+.booking-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;  /* отступ между элементами */
 }
 
 .booking-status {
@@ -325,15 +333,151 @@ body {
     margin-top: 3rem;
 }
 
+/* Таблица бронирований */
+.bookings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.bookings-table thead {
+    background: linear-gradient(135deg, #2c82c9, #2980b9);
+    color: white;
+}
+
+.bookings-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border: none;
+}
+
+.bookings-table td {
+    padding: 1.2rem;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+}
+
+.bookings-table tbody tr:hover {
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+
+.bookings-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.bookings-table small {
+    display: block;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* Статусы в таблице */
+.status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.status-paid,
+.status-оплачен {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-pending,
+.status-ожидание {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-cancelled,
+.status-отменен {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Адаптивность таблицы */
+@media (max-width: 1024px) {
+    .bookings-table {
+        font-size: 0.9rem;
+    }
+    
+    .bookings-table th,
+    .bookings-table td {
+        padding: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .bookings-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .bookings-table thead {
+        display: none;
+    }
+    
+    .bookings-table tbody,
+    .bookings-table tr,
+    .bookings-table td {
+        display: block;
+    }
+    
+    .bookings-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .bookings-table td {
+        padding: 0.5rem 0;
+        border-bottom: none;
+        text-align: right;
+    }
+    
+    .bookings-table td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        color: #2c82c9;
+    }
+}
+
+
+
+
 /* утилиты */
 .text-center {
     text-align: center;
 }
 
-.mt-1 { margin-top: 1rem; }
-.mt-2 { margin-top: 2rem; }
-.mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
+.mt-1 {
+    margin-top: 1rem;
+}
+
+.mt-2 {
+    margin-top: 2rem;
+}
+
+.mb-1 {
+    margin-bottom: 1rem;
+}
+
+.mb-2 {
+    margin-bottom: 2rem;
+}
 
 /* адаптивность */
 @media (max-width: 768px) {

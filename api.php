@@ -9,7 +9,6 @@ require_once 'config.php';
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 $data = json_decode(file_get_contents('php://input'), true) ?? $_GET;
 
-// ========================================
 // РЕГИСТРАЦИЯ
 if ($action === 'register') {
     $firstName = isset($data['FirstName']) ? $connection->real_escape_string($data['FirstName']) : '';
@@ -45,7 +44,6 @@ if ($action === 'register') {
     }
 }
 
-// ========================================
 // ВХОД
 else if ($action === 'login') {
     $email = isset($data['Email']) ? $connection->real_escape_string($data['Email']) : '';
@@ -75,7 +73,6 @@ else if ($action === 'login') {
     sendResponse(true, 'Вход успешен', ['passenger' => $passenger]);
 }
 
-// ========================================
 // ПОЛУЧИТЬ АЭРОПОРТЫ
 else if ($action === 'get-airports') {
     $query = "SELECT DISTINCT City FROM Airport ORDER BY City ASC";
@@ -93,7 +90,6 @@ else if ($action === 'get-airports') {
     sendResponse(true, '', ['airports' => $airports]);
 }
 
-// ========================================
 // ПОИСК РЕЙСОВ
 else if ($action === 'search-flights') {
     $departureCity = isset($data['DepartureCity']) ? $connection->real_escape_string($data['DepartureCity']) : '';
@@ -104,7 +100,6 @@ else if ($action === 'search-flights') {
         sendResponse(false, 'Все параметры поиска обязательны');
     }
 
-    // SQL запрос для поиска рейсов
     $query = "
     SELECT
         f.FlightID,
@@ -142,72 +137,107 @@ else if ($action === 'search-flights') {
     sendResponse(true, '', ['flights' => $flights]);
 }
 
-// ========================================
+// СМЕНИТЬ ПОЧТУ
+else if ($action === 'change-email') {
+    $passengerID = isset($data['PassengerID']) ? (int) $data['PassengerID'] : 0;
+    $newEmail = isset($data['NewEmail']) ? $connection->real_escape_string($data['NewEmail']) : '';
+
+    if (!$passengerID || !$newEmail) {
+        sendResponse(false, 'PassengerID и NewEmail обязательны');
+    }
+
+    // Проверяем если новая почта уже существует
+    $checkEmail = $connection->query("
+    SELECT PassengerID FROM Passenger
+    WHERE Email = '$newEmail'
+    AND PassengerID != $passengerID
+    ");
+
+    if ($checkEmail && $checkEmail->num_rows > 0) {
+        sendResponse(false, 'Этот адрес почты уже зарегистрирован');
+    }
+
+    // Обновляем почту
+    $updateQuery = "
+    UPDATE Passenger
+    SET Email = '$newEmail'
+    WHERE PassengerID = $passengerID
+    ";
+
+    if (!$connection->query($updateQuery)) {
+        sendResponse(false, 'Ошибка при обновлении почты: ' . $connection->error);
+    }
+
+    sendResponse(true, 'Почта успешно изменена');
+}
+
 // СОЗДАТЬ БРОНИРОВАНИЕ
 else if ($action === 'create-booking') {
-    $passengerID = isset($data['PassengerID']) ? (int)$data['PassengerID'] : 0;
-    $flightID = isset($data['FlightID']) ? (int)$data['FlightID'] : 0;
+    $passengerID = isset($data['PassengerID']) ? (int) $data['PassengerID'] : 0;
+    $flightID = isset($data['FlightID']) ? (int) $data['FlightID'] : 0;
     $seatNumber = isset($data['SeatNumber']) ? $connection->real_escape_string($data['SeatNumber']) : '';
 
     if (!$passengerID || !$flightID || !$seatNumber) {
         sendResponse(false, 'Все параметры обязательны');
+        return;
     }
 
     // Проверяем если место уже забронировано
     $checkSeat = $connection->query("
-    SELECT BookingID FROM Booking
-    WHERE FlightID = $flightID
-    AND SeatNumber = '$seatNumber'
+        SELECT BookingID FROM Booking
+        WHERE FlightID = $flightID
+        AND SeatNumber = '$seatNumber'
     ");
 
     if ($checkSeat && $checkSeat->num_rows > 0) {
         sendResponse(false, 'Это место уже забронировано');
+        return;
     }
 
     // Получаем цену рейса
     $flightQuery = $connection->query("SELECT BasePrice FROM Flight WHERE FlightID = $flightID");
-
     if (!$flightQuery || $flightQuery->num_rows === 0) {
         sendResponse(false, 'Рейс не найден');
+        return;
     }
 
     $flight = $flightQuery->fetch_assoc();
     $totalPrice = $flight['BasePrice'];
 
-    // Вставляем бронирование с статусом 'оплачен'
+    // Вставляем бронирование
     $bookingQuery = "
-    INSERT INTO Booking (PassengerID, FlightID, Status, TotalPrice, SeatNumber, BookingDate)
-    VALUES ($passengerID, $flightID, 'оплачен', $totalPrice, '$seatNumber', NOW())
+        INSERT INTO Booking (PassengerID, FlightID, Status, TotalPrice, SeatNumber, BookingDate)
+        VALUES ($passengerID, $flightID, 'оплачен', $totalPrice, '$seatNumber', NOW())
     ";
 
     if (!$connection->query($bookingQuery)) {
         sendResponse(false, 'Ошибка при бронировании: ' . $connection->error);
+        return;
     }
 
     $bookingID = $connection->insert_id;
 
-    // Создаем платеж (ошибка не критична)
-    $paymentQuery = "
-    INSERT INTO Payment (BookingID, Amount, PaymentMethod, Status, PaymentDate)
-    VALUES ($bookingID, $totalPrice, 'Карта', 'оплачен', NOW())
-    ";
-    @$connection->query($paymentQuery);
-
-    // Создаем посадочный талон (ошибка не критична)
-    $boardingQuery = "
-    INSERT INTO BoardingPass (BookingID, Gate, BoardingTime, CheckinStatus)
-    VALUES ($bookingID, '1A', DATE_ADD(NOW(), INTERVAL 1 DAY), 'Не регистрирован')
-    ";
-    @$connection->query($boardingQuery);
-
-    // ОБЯЗАТЕЛЬНЫЙ ОТВЕТ
     sendResponse(true, 'Бронирование успешно', ['bookingID' => $bookingID]);
+    return;
+
+    // Создание платежа
+    $paymentQuery = "
+        INSERT INTO Payment (BookingID, Amount, PaymentMethod, Status, PaymentDate)
+        VALUES ($bookingID, $totalPrice, 'Карта', 'оплачен', NOW())
+    ";
+    $connection->query($paymentQuery);
+
+    // Создание посадочного талона
+    $boardingQuery = "
+        INSERT INTO BoardingPass (BookingID, Gate, BoardingTime, CheckinStatus)
+        VALUES ($bookingID, '1A', DATE_ADD(NOW(), INTERVAL 1 DAY), 'Не регистрирован')
+    ";
+    $connection->query($boardingQuery);
 }
 
-// ========================================
 // ПОЛУЧИТЬ БРОНИРОВАНИЯ ПАССАЖИРА
 else if ($action === 'get-bookings') {
-    $passengerID = isset($data['PassengerID']) ? (int)$data['PassengerID'] : 0;
+    $passengerID = isset($data['PassengerID']) ? (int) $data['PassengerID'] : 0;
 
     if (!$passengerID) {
         sendResponse(false, 'PassengerID обязателен');
@@ -253,7 +283,6 @@ else if ($action === 'get-bookings') {
     sendResponse(true, '', ['bookings' => $bookings]);
 }
 
-// ========================================
 // ЕСЛИ ACTION НЕИЗВЕСТЕН
 else {
     sendResponse(false, 'Неизвестное действие');

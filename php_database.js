@@ -19,7 +19,7 @@ async function callAPI(action, data = {}) {
         }
 
         const responseText = await response.text();
-        
+
         if (!responseText || responseText.trim() === '') {
             throw new Error('Пустой ответ от сервера');
         }
@@ -36,6 +36,12 @@ async function callAPI(action, data = {}) {
 // РЕГИСТРАЦИЯ
 async function registerPassenger(firstName, lastName, passportNumber, dateOfBirth, email, password, phoneNumber) {
     try {
+
+        if (!/^\d{6}$/.test(passportNumber)) {
+            alert('❌ Паспорт должен содержать ровно 6 цифр (например: 123456)');
+            return;
+        }
+
         const data = {
             FirstName: firstName,
             LastName: lastName,
@@ -180,7 +186,7 @@ function displayFlights(flights) {
     let html = '<div style="margin-top: 20px; overflow-x: auto;">';
     html += '<h2 style="margin-bottom: 15px; color: #1976d2;">✈️ Доступные рейсы</h2>';
     html += '<table style="width: 100%; border-collapse: collapse; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden;">';
-    
+
     // Заголовок таблицы
     html += '<thead>';
     html += '<tr style="background-color: #1976d2; color: white;">';
@@ -194,15 +200,15 @@ function displayFlights(flights) {
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Действие</th>';
     html += '</tr>';
     html += '</thead>';
-    
+
     // Тело таблицы
     html += '<tbody>';
 
     flights.forEach((flight, index) => {
         const bgColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
         const freeSeats = flight.Capacity - flight.BookedSeats;
-        const statusColor = flight.Status === 'По расписанию' ? '#4caf50' : 
-                           flight.Status === 'Задержан' ? '#ff9800' : '#d32f2f';
+        const statusColor = flight.Status === 'По расписанию' ? '#4caf50' :
+            flight.Status === 'Задержан' ? '#ff9800' : '#d32f2f';
 
         html += `<tr style="background-color: ${bgColor}; border-bottom: 1px solid #e0e0e0;">`;
         html += `<td style="padding: 12px; border-right: 1px solid #e0e0e0;"><strong>${flight.FlightNumber}</strong></td>`;
@@ -212,7 +218,7 @@ function displayFlights(flights) {
         html += `<td style="padding: 12px; border-right: 1px solid #e0e0e0; text-align: center; color: ${statusColor}; font-weight: bold;">${flight.Status}</td>`;
         html += `<td style="padding: 12px; border-right: 1px solid #e0e0e0; text-align: right; color: #1976d2; font-weight: bold; font-size: 16px;">${flight.BasePrice} ₽</td>`;
         html += `<td style="padding: 12px; border-right: 1px solid #e0e0e0; text-align: center;">`;
-        
+
         // Визуальная полоса свободных мест
         const percentFree = (freeSeats / flight.Capacity) * 100;
         const barColor = percentFree > 50 ? '#4caf50' : percentFree > 20 ? '#ff9800' : '#d32f2f';
@@ -220,7 +226,7 @@ function displayFlights(flights) {
         html += `<div style="background-color: ${barColor}; width: ${percentFree}%; height: 100%;"></div>`;
         html += `</div>`;
         html += `<span style="font-size: 12px; font-weight: bold;">${freeSeats}/${flight.Capacity}</span>`;
-        
+
         html += `</td>`;
         html += `<td style="padding: 12px; text-align: center;">`;
         html += `<button onclick="bookFlight(${flight.FlightID})" style="padding: 8px 16px; background-color: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#1565c0'" onmouseout="this.style.backgroundColor='#1976d2'">`;
@@ -249,7 +255,19 @@ async function bookFlight(flightID) {
         const passengerID = localStorage.getItem('passengerID');
         const seatNumber = prompt('Введите номер места (например: 12A):');
 
-        if (!seatNumber) return;
+        if (!seatNumber) {
+            alert('❌ Вы отменили ввод номера места.');
+            return;
+        }
+
+        const seatPattern = /^(?:[1-9]|1\d|2[0-4])[A-F]$/i;
+
+        if (!seatPattern.test(seatNumber)) {
+            alert('❌ Неверный формат. Введите номер от 1A до 24F (например: 12A).');
+            return; 
+        }
+
+        alert('✅ Место принято: ' + seatNumber.toUpperCase());
 
         const data = {
             PassengerID: parseInt(passengerID),
@@ -276,7 +294,7 @@ async function bookFlight(flightID) {
 async function loadCities() {
     try {
         console.log('📍 Начало загрузки городов...');
-        
+
         const response = await callAPI('get-airports', {});
 
         if (response.success) {
@@ -401,10 +419,49 @@ function updateNavigation() {
     }
 }
 
+// ФОРМАТИРОВАНИЕ НОМЕРА ТЕЛЕФОНА (8 963 910 70 98)
+function formatPhoneNumber(input) {
+    // Убрать всё кроме цифр
+    let digits = input.value.replace(/\D/g, '');
+    
+    // Максимум 11 цифр для русского формата
+    if (digits.length > 11) {
+        digits = digits.slice(0, 11);
+    }
+    
+    // Форматирование 8 963 910 70 98
+    let formatted = '';
+    if (digits.length > 0) {
+        formatted = digits.slice(0, 1); // 8
+        if (digits.length > 1) {
+            formatted += ' ' + digits.slice(1, 4); // 8 963
+        }
+        if (digits.length > 4) {
+            formatted += ' ' + digits.slice(4, 7); // 8 963 910
+        }
+        if (digits.length > 7) {
+            formatted += ' ' + digits.slice(7, 9); // 8 963 910 70
+        }
+        if (digits.length > 9) {
+            formatted += ' ' + digits.slice(9, 11); // 8 963 910 70 98
+        }
+    }
+    
+    input.value = formatted;
+}
+
+
 // ИНИЦИАЛИЗАЦИЯ
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('🚀 DOMContentLoaded - начало инициализации');
     updateNavigation();
     loadCities();
     console.log('✅ PHP JavaScript инициализирован');
+
+    const phoneInput = document.getElementById('phoneNumber');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            formatPhoneNumber(this);
+        });
+    }
 });

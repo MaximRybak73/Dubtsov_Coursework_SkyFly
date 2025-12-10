@@ -9,10 +9,9 @@
 </head>
 
 <body>
-    <!-- Навигация -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">✈️ MaxFly Airlines</div>
+            <div class="nav-brand">MaxFly Airlines</div>
             <div class="nav-links">
                 <a href="index.html" id="navHome"
                     style="background-color: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;">Главная</a>
@@ -23,13 +22,12 @@
                 <a href="profile.html" id="navProfile"
                     style="display: none; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">👤
                     Личный кабинет</a>
-                   <a href="#" id="navLogout" onclick="logoutPassenger(); return false;"
+                <a href="#" id="navLogout" onclick="logoutPassenger(); return false;"
                     style="display: none; color: #ff6b6b; background-color: #ffffff; padding: 0.5rem 1rem; border-radius: 5px;">Выход</a>
             </div>
         </div>
     </nav>
 
-    <!-- Контейнер регистрации -->
     <div class="container">
         <div class="auth-container">
             <h2>Регистрация</h2>
@@ -49,7 +47,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="passportNumber">Номер паспорта *</label>
-                        <input type="text" id="passportNumber" required placeholder="Например: 12 34 567890">
+                        <input type="text" id="passportNumber" maxlength="6" inputmode="numeric" pattern="^\d{6}$"
+                            title="Паспорт должен содержать ровно 6 цифр" required placeholder="Например: 123456">
                     </div>
                     <div class="form-group">
                         <label for="dateOfBirth">Дата рождения *</label>
@@ -69,7 +68,8 @@
                     </div>
                     <div class="form-group">
                         <label for="phoneNumber">Номер телефона</label>
-                        <input type="tel" id="phoneNumber" placeholder="Например: +7 999 123 45 67">
+                        <input type="tel" id="phoneNumber" inputmode="numeric" maxlength="11"
+                            placeholder="Н-р: 89993334455">
                     </div>
                 </div>
 
@@ -84,7 +84,7 @@
 
     <!-- Футер -->
     <footer class="footer">
-        <p>&copy; 2024 MaxFly Airlines. Все права защищены.</p>
+        <p>&copy; 2025 MaxFly Airlines. Все права защищены.</p>
     </footer>
 
     <script src="php_database.js"></script>

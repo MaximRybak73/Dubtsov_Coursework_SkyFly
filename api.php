@@ -24,6 +24,16 @@ if ($action === 'register') {
         sendResponse(false, 'Все поля обязательны');
     }
 
+    if (!preg_match('/^\d{6}$/', $passportNumber)) {
+        sendResponse(false, 'Паспорт должен содержать ровно 6 цифр');
+    }
+
+    // Убираем пробелы и проверяем телефон
+    $phoneDigits = preg_replace('/\D/', '', $phoneNumber);
+    if (!preg_match('/^79\d{9}$|^89\d{9}$/', $phoneDigits)) {
+        sendResponse(false, 'Некорректный номер телефона. Используйте формат: 8 963 910 70 98');
+    }
+
     // Проверка если email уже существует
     $checkEmail = $connection->query("SELECT PassengerID FROM Passenger WHERE Email = '$email'");
     if ($checkEmail && $checkEmail->num_rows > 0) {
@@ -179,6 +189,11 @@ else if ($action === 'create-booking') {
 
     if (!$passengerID || !$flightID || !$seatNumber) {
         sendResponse(false, 'Все параметры обязательны');
+        return;
+    }
+
+    if (!preg_match('/^(?:[1-9]|1\d|2[0-4])[A-F]$/i', $seatNumber)) {
+        sendResponse(false, 'Неверный формат места. Допустимый формат: 1A-24F');
         return;
     }
 

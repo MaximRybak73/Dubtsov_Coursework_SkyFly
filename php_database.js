@@ -11,20 +11,20 @@ async function callAPI(action, data = {}) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data) //превратить объект в джсон строку перед отправкой
         });
 
         if (!response.ok) {
             throw new Error(`HTTP ошибка! Статус: ${response.status}`);
         }
 
-        const responseText = await response.text();
+        const responseText = await response.text(); //прочитать ответ как обычный текст
 
         if (!responseText || responseText.trim() === '') {
             throw new Error('Пустой ответ от сервера');
         }
 
-        const result = JSON.parse(responseText);
+        const result = JSON.parse(responseText); //преобразовать текст в объект
         return result;
     } catch (error) {
         console.error('❌ Ошибка API:', error);
@@ -42,7 +42,7 @@ async function registerPassenger(firstName, lastName, passportNumber, dateOfBirt
             return;
         }
 
-        const data = {
+        const data = { //сбор всех данных полей формы в один объект
             FirstName: firstName,
             LastName: lastName,
             PassportNumber: passportNumber,
@@ -162,7 +162,7 @@ function formatDateTime(dateTimeString) {
 
     const date = new Date(dateTimeString);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); //если длина строки меньше 2 символов, слева добавляется '0'
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
 
@@ -195,8 +195,8 @@ function displayFlights(flights) {
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Вылет</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Прилет</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Статус</th>';
-    html += '<th style="padding: 12px; text-align: right; border: 1px solid #1565c0; font-weight: bold;">💰 Цена</th>';
-    html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">🪑 Места</th>';
+    html += '<th style="padding: 12px; text-align: right; border: 1px solid #1565c0; font-weight: bold;">Цена</th>';
+    html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Места</th>';
     html += '<th style="padding: 12px; text-align: center; border: 1px solid #1565c0; font-weight: bold;">Действие</th>';
     html += '</tr>';
     html += '</thead>';
@@ -253,7 +253,7 @@ async function bookFlight(flightID) {
 
     try {
         const passengerID = localStorage.getItem('passengerID');
-        const seatNumber = prompt('Введите номер места (например: 12A):');
+        const seatNumber = prompt('Введите номер места (например: 12A):'); //окошко с полем для ввода
 
         if (!seatNumber) {
             alert('❌ Вы отменили ввод номера места.');
@@ -267,7 +267,7 @@ async function bookFlight(flightID) {
             return; 
         }
 
-        alert('✅ Место принято: ' + seatNumber.toUpperCase());
+        alert('Проверяем место: ' + seatNumber.toUpperCase());
 
         const data = {
             PassengerID: parseInt(passengerID),
@@ -275,7 +275,7 @@ async function bookFlight(flightID) {
             SeatNumber: seatNumber
         };
 
-        console.log('📤 Отправляем данные бронирования:', data);
+        console.log('Отправляем данные бронирования:', data);
 
         const result = await callAPI('create-booking', data);
 
@@ -309,7 +309,7 @@ async function loadCities() {
                 return;
             }
 
-            // Очищаем старые опции (кроме первой)
+            // Очищаем старые опции (кроме первой т к она "Выберите город") чтобы не юыло дублирования городов
             while (departureSelect.options.length > 1) {
                 departureSelect.remove(1);
             }
@@ -419,41 +419,10 @@ function updateNavigation() {
     }
 }
 
-// ФОРМАТИРОВАНИЕ НОМЕРА ТЕЛЕФОНА (8 963 910 70 98)
-function formatPhoneNumber(input) {
-    // Убрать всё кроме цифр
-    let digits = input.value.replace(/\D/g, '');
-    
-    // Максимум 11 цифр для русского формата
-    if (digits.length > 11) {
-        digits = digits.slice(0, 11);
-    }
-    
-    // Форматирование 8 963 910 70 98
-    let formatted = '';
-    if (digits.length > 0) {
-        formatted = digits.slice(0, 1); // 8
-        if (digits.length > 1) {
-            formatted += ' ' + digits.slice(1, 4); // 8 963
-        }
-        if (digits.length > 4) {
-            formatted += ' ' + digits.slice(4, 7); // 8 963 910
-        }
-        if (digits.length > 7) {
-            formatted += ' ' + digits.slice(7, 9); // 8 963 910 70
-        }
-        if (digits.length > 9) {
-            formatted += ' ' + digits.slice(9, 11); // 8 963 910 70 98
-        }
-    }
-    
-    input.value = formatted;
-}
-
 
 // ИНИЦИАЛИЗАЦИЯ
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🚀 DOMContentLoaded - начало инициализации');
+    console.log('DOMContentLoaded - начало инициализации');
     updateNavigation();
     loadCities();
     console.log('✅ PHP JavaScript инициализирован');

@@ -201,7 +201,7 @@
             bookingsList.innerHTML = '<p style="text-align: center; color: #999;">Загрузка...</p>';
 
             callAPI('get-bookings', { PassengerID: passenger.PassengerID })
-                .then(response => {
+                .then(response => { //когда апи пхп вернуд джсон то он попадает в респонс
                     console.log('✅ Ответ API get-bookings:', response);
 
                     if (response && response.success && response.bookings && response.bookings.length > 0) {
@@ -250,7 +250,7 @@
         }
 
         // Обработка смены почты
-        document.getElementById('changeEmailBtn').addEventListener('click', function () {
+        document.getElementById('changeEmailBtn').addEventListener('click', function () { //повесил обработчик что сделать при клике на кнопку
             document.getElementById('emailModal').classList.remove('hidden');
         });
 

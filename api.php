@@ -1,17 +1,22 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
+error_reporting(E_ALL); //показывать все ошибки
+ini_set('display_errors', 0); //не показывать ошибки пользователю на экране
+ini_set('log_errors', 1); //писать ошибки в лог файл
 
 require_once 'config.php';
 
 // Получаем действие и данные
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-$data = json_decode(file_get_contents('php://input'), true) ?? $_GET;
+$action = isset($_GET['action']) ? $_GET['action'] : ''; //взять из URL параметр action, если его нет пустая строка
+$data = json_decode(file_get_contents('php://input'), true) ?? $_GET; //превращение JSON в PHP-массив то что передало JS по POST
+//?? $_GET - если джсон пустой взять данные из URL ( на случай если джсон не пришел взять из гет запроса)
 
 // РЕГИСТРАЦИЯ
 if ($action === 'register') {
     $firstName = isset($data['FirstName']) ? $connection->real_escape_string($data['FirstName']) : '';
+    //isset - есть ли в массиве data ключ FirstName?
+    // если есть то eal_escape_string - убрать опасные символы для защиты от SQL-инъекций
+    //если нет- записать пустую строку
+
     $lastName = isset($data['LastName']) ? $connection->real_escape_string($data['LastName']) : '';
     $passportNumber = isset($data['PassportNumber']) ? $connection->real_escape_string($data['PassportNumber']) : '';
     $dateOfBirth = isset($data['DateOfBirth']) ? $connection->real_escape_string($data['DateOfBirth']) : '';
@@ -21,17 +26,11 @@ if ($action === 'register') {
 
     // Валидация
     if (!$firstName || !$lastName || !$passportNumber || !$dateOfBirth || !$email || !$password) {
-        sendResponse(false, 'Все поля обязательны');
+        sendResponse(false, 'Все поля обязательны'); //Формирвание JSON-ответа и отправка ДЖСу
     }
 
     if (!preg_match('/^\d{6}$/', $passportNumber)) {
         sendResponse(false, 'Паспорт должен содержать ровно 6 цифр');
-    }
-
-    // Убираем пробелы и проверяем телефон
-    $phoneDigits = preg_replace('/\D/', '', $phoneNumber);
-    if (!preg_match('/^79\d{9}$|^89\d{9}$/', $phoneDigits)) {
-        sendResponse(false, 'Некорректный номер телефона. Используйте формат: 8 963 910 70 98');
     }
 
     // Проверка если email уже существует
@@ -47,7 +46,7 @@ if ($action === 'register') {
     $query = "INSERT INTO Passenger (FirstName, LastName, PassportNumber, DateOfBirth, Email, Password, PhoneNumber)
     VALUES ('$firstName', '$lastName', '$passportNumber', '$dateOfBirth', '$email', '$hashedPassword', '$phoneNumber')";
 
-    if ($connection->query($query)) {
+    if ($connection->query($query)) { //успешно ли прошел запрос query?
         sendResponse(true, 'Регистрация успешна');
     } else {
         sendResponse(false, 'Ошибка при регистрации: ' . $connection->error);
@@ -71,7 +70,7 @@ else if ($action === 'login') {
         sendResponse(false, 'Пассажир не найден');
     }
 
-    $passenger = $result->fetch_assoc();
+    $passenger = $result->fetch_assoc(); //взять следующую строку из результата SELECT в виде массива
 
     // Проверяем пароль
     if (!verifyPassword($password, $passenger['Password'])) {
@@ -79,8 +78,8 @@ else if ($action === 'login') {
     }
 
     // Удаляем пароль из результата
-    unset($passenger['Password']);
-    sendResponse(true, 'Вход успешен', ['passenger' => $passenger]);
+    unset($passenger['Password']); //для безопасности
+    sendResponse(true, 'Вход успешен', ['passenger' => $passenger]); //отправка на фронт данных пассажира чтобы потом вставить в localStorage(чтобы показывать имя и тд)
 }
 
 // ПОЛУЧИТЬ АЭРОПОРТЫ
@@ -230,7 +229,7 @@ else if ($action === 'create-booking') {
         return;
     }
 
-    $bookingID = $connection->insert_id;
+    $bookingID = $connection->insert_id; //получить ID только что вставленной записи в таблицу
 
     sendResponse(true, 'Бронирование успешно', ['bookingID' => $bookingID]);
     return;

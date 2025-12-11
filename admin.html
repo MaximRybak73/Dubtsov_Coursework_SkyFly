@@ -88,7 +88,7 @@
 
     <script src="php_database.js"></script>
     <script>
-        // Проверка что только админ может видеть эту страницу
+        // Ожидание загрузки страницы и Проверка что только админ может видеть эту страницу
         document.addEventListener('DOMContentLoaded', function() {
             if (!isAdmin()) {
                 alert('❌ Доступ запрещен! Только администраторы могут открывать эту страницу.');
@@ -97,23 +97,23 @@
             }
 
             updateNavigation();
-            highlightActiveLink();
+            highlightActiveLink(); //Подсветить активную ссылку в меню
         });
 
-        // Обработка добавления рейса
+        // если нажата кнопка Добавить рейс
         function handleAddFlight(event) {
-            event.preventDefault();
+            event.preventDefault();//блокировка отправки данных на сервер
             alert('⚙️ Функция добавления рейса находится в разработке');
         }
 
-        // Активация текущей ссылки навигации
+        // подсветка текущей ссылки навигации
         function highlightActiveLink() {
             const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-            const navLinks = document.querySelectorAll('.nav-links a');
+            const navLinks = document.querySelectorAll('.nav-links a'); //найти все ссылки внутри класса навлинкс
             
             navLinks.forEach(link => {
                 const href = link.getAttribute('href');
-                
+                // если это текущая страница то стиль active
                 if (href === currentPage || (currentPage === '' && href === 'index.html')) {
                     link.classList.add('active');
                 } else {

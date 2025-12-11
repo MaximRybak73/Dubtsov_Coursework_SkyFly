@@ -9,7 +9,7 @@ html, body {
 }
 
 body {
-    min-height: 100vh;      /* чтобы страница была не ниже окна */  /* [web:13] */
+    min-height: 100vh;      /* чтобы страница была не ниже окна */
     display: flex;
     flex-direction: column;
 }
@@ -32,6 +32,7 @@ nav a.active {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%; 
 }
 
 /* навигация */
@@ -348,6 +349,7 @@ nav a.active {
 /* Таблица бронирований */
 .bookings-table {
     width: 100%;
+    table-layout: fixed; 
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
@@ -492,7 +494,7 @@ nav a.active {
 }
 
 /* адаптивность */
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* применить если шир экрана <= 768 */
     .form-row {
         grid-template-columns: 1fr;
     }

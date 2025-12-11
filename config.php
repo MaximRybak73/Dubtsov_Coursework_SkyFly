@@ -1,5 +1,5 @@
 <?php
-//КОНФИГУРАЦИЯ БД НА PHP
+//КОНФИГУРАЦИЯ БД
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
@@ -11,7 +11,7 @@ $connection = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 // Проверка подключения
 if ($connection->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Ошибка подключения к БД: ' . $connection->connect_error]));
+    die(json_encode(['success' => false, 'message' => 'Ошибка подключения к БД: ' . $connection->connect_error])); //die - остановка выполнеиня php
 }
 
 // Установка кодировки UTF-8
@@ -29,8 +29,8 @@ function sendResponse($success, $message = '', $data = null) {
     }
 
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($response, JSON_UNESCAPED_UNICODE);
-    exit;
+    echo json_encode($response, JSON_UNESCAPED_UNICODE); //превращение массива $response в JSON-строку
+    exit; //остановка выполнения скрипта после отправки ответа
 }
 
 // Функция для хеширования пароля
